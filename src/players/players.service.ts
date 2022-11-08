@@ -1,15 +1,23 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
+import { MessagePatterns } from 'src/common/enum/message-patterns.enum';
+import { Services } from 'src/common/enum/service-names.enum';
 import { CreatePlayerDto } from './dto/create-player.dto';
 import { UpdatePlayerDto } from './dto/update-player.dto';
 
 @Injectable()
 export class PlayersService {
-  create(createPlayerDto: CreatePlayerDto) {
-    return 'This action adds a new player';
+  constructor(
+    @Inject(Services.PLAYERS_SERVICE)
+    private readonly client: ClientProxy,
+  ) {}
+
+  create(data: CreatePlayerDto) {
+    return this.client.emit(MessagePatterns.CREATE_PLAYER, data);
   }
 
   findAll() {
-    return `This action returns all players`;
+    return this.client.send(MessagePatterns.LIST_PLAYERS, {});
   }
 
   findOne(id: number) {
